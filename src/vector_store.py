@@ -49,7 +49,7 @@ def create_vector_store(chunks: List[Document], embeddings: GoogleGenerativeAIEm
         batch = chunks[i : i + _BATCH_SIZE]
         batch_num = i // _BATCH_SIZE + 1
         total_batches = (total + _BATCH_SIZE - 1) // _BATCH_SIZE
-        print(f"  → Embedding batch {batch_num}/{total_batches} ({len(batch)} chunks)...")
+        print(f"  -> Embedding batch {batch_num}/{total_batches} ({len(batch)} chunks)...")
 
         if vector_db is None:
             # First batch — create a new FAISS index
@@ -61,13 +61,13 @@ def create_vector_store(chunks: List[Document], embeddings: GoogleGenerativeAIEm
 
         # Respect rate limit between batches (skip delay after last batch)
         if i + _BATCH_SIZE < total:
-            print(f"  ⏳ Rate-limit pause ({_BATCH_DELAY}s) before next batch...")
+            print(f"  [Rate-limit pause] Wait {_BATCH_DELAY}s before next batch...")
             time.sleep(_BATCH_DELAY)
 
     # Save the merged index locally
     os.makedirs(save_path, exist_ok=True)
     vector_db.save_local(save_path)
-    print(f"[Vector Store] ✅ FAISS database built and saved at '{save_path}'.")
+    print(f"[Vector Store] FAISS database built and saved at '{save_path}'.")
     return vector_db
 
 
