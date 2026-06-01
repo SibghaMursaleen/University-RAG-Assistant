@@ -1,0 +1,99 @@
+# ─────────────────────────────────────────────
+#  University RAG Assistant  —  .gitignore
+# ─────────────────────────────────────────────
+
+# ── Python environments ──────────────────────
+.venv/
+venv/
+env/
+ENV/
+.Python
+pip-selfcheck.json
+
+# ── Python caching & compiled files ─────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+
+# ── Distribution & packaging ─────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+sdist/
+
+# ── Environment variables (SECRET — never commit!) ──
+.env
+.env.local
+.env.*.local
+*.env
+
+# ── Local FAISS vector database ──────────────
+#    Regenerated automatically from your PDFs
+vector_db/
+
+# ── Uploaded PDF documents ───────────────────
+#    Keep the folder structure but ignore content
+data/pdfs/*
+!data/pdfs/.gitkeep
+
+# ── Logs & debug files ───────────────────────
+*.log
+logs/
+*.log.*
+
+# ── OS generated files ───────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ── IDE & editor configs ─────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# ── Jupyter Notebooks ────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── pytest / testing ─────────────────────────
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# ── mypy / type-checking ─────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ── Streamlit cache ──────────────────────────
+.streamlit/secrets.toml
+
+# ── Temporary & scratch files ─────────────────
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
