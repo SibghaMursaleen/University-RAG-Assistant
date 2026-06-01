@@ -114,14 +114,29 @@ html, body, .stApp {{
     color: var(--text-color) !important;
 }}
 
+/* Ensure top header bar and bottom floating input container blend with theme */
+[data-testid="stHeader"],
+[data-testid="stBottom"] {{
+    background: var(--bg-app) !important;
+    background-color: var(--bg-app) !important;
+}}
+
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {{
     background: var(--sidebar-bg) !important;
     border-right: 1px solid var(--sidebar-border) !important;
 }}
-[data-testid="stSidebar"] .stMarkdown h1,
-[data-testid="stSidebar"] .stMarkdown h2,
-[data-testid="stSidebar"] .stMarkdown h3 {{
+/* Ensure all text labels and headers inside the sidebar use correct theme text color */
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] .stMarkdown,
+[data-testid="stSidebar"] h4,
+[data-testid="stSidebar"] h5 {{
+    color: var(--text-color) !important;
+}}
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {{
     color: var(--sidebar-title) !important;
 }}
 
@@ -168,6 +183,12 @@ html, body, .stApp {{
     border: 1.5px dashed var(--sidebar-border) !important;
     border-radius: 12px !important;
     padding: 0.5rem !important;
+}}
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] div,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] small {{
+    color: var(--text-color) !important;
 }}
 
 /* ── Buttons ── */
