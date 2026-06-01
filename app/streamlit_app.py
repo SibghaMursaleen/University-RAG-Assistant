@@ -211,11 +211,22 @@ html, body, .stApp {
     box-shadow: 0 4px 24px rgba(99, 102, 241, 0.25) !important;
 }
 
+/* Make all internal wrapper divs transparent and borderless */
+[data-testid="stChatInput"] > div div {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 /* Make the internal textarea transparent and borderless */
 [data-testid="stChatInput"] textarea {
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    outline: none !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 0.95rem !important;
@@ -395,28 +406,13 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── API Key ──────────────────────────────────────────────────────────────
-    st.markdown("#### 🔑 Google Gemini API Key")
-    default_key = os.getenv("GOOGLE_API_KEY", "")
-    if default_key and "your_gemini" not in default_key:
-        api_key_input = st.text_input(
-            "API Key", value=default_key, type="password",
-            label_visibility="collapsed"
-        )
-    else:
-        api_key_input = st.text_input(
-            "API Key", placeholder="AIzaSy...", type="password",
-            label_visibility="collapsed"
-        )
-
-    if api_key_input and "your_gemini" not in api_key_input:
-        st.markdown(status_badge("API Key Present", "ok"), unsafe_allow_html=True)
+    # ── API Key Detection (Securely Loaded from Environment Only) ──────────────
+    api_key = os.getenv("GOOGLE_API_KEY", "")
+    if api_key and "your_gemini" not in api_key:
         st.session_state.api_key_ok = True
     else:
-        st.markdown(status_badge("API Key Missing", "err"), unsafe_allow_html=True)
         st.session_state.api_key_ok = False
-
-    st.markdown('<hr class="divider"/>', unsafe_allow_html=True)
+        st.error("🔑 API Key Missing: Please configure `GOOGLE_API_KEY` in your `.env` file.")
 
     # ── Document Upload ───────────────────────────────────────────────────────
     st.markdown("#### 📂 Upload Course Documents")
@@ -439,9 +435,9 @@ with st.sidebar:
             with st.spinner("🔄 Embedding documents and building FAISS index…"):
                 try:
                     if files_to_index:
-                        chain = index_pdfs(api_key_input, files_to_index)
+                        chain = index_pdfs(api_key, files_to_index)
                     else:
-                        chain = load_pipeline(api_key_input)
+                        chain = load_pipeline(api_key)
                     st.session_state.rag_chain = chain
                     st.session_state.db_ready  = True
                     st.success("✅ Knowledge base ready!")
@@ -452,6 +448,11 @@ with st.sidebar:
 
     # ── DB Status ─────────────────────────────────────────────────────────────
     st.markdown("#### 🗄️ System Status")
+    if st.session_state.api_key_ok:
+        st.markdown(status_badge("API Key: Configured", "ok"), unsafe_allow_html=True)
+    else:
+        st.markdown(status_badge("API Key: Missing (.env)", "err"), unsafe_allow_html=True)
+
     if check_db_exists():
         st.markdown(status_badge("FAISS Index: Loaded", "ok"), unsafe_allow_html=True)
     else:
@@ -465,10 +466,9 @@ with st.sidebar:
     # ── Auto-load if DB already exists ───────────────────────────────────────
     if (check_db_exists()
             and st.session_state.rag_chain is None
-            and st.session_state.api_key_ok
-            and api_key_input):
+            and st.session_state.api_key_ok):
         try:
-            chain = load_pipeline(api_key_input)
+            chain = load_pipeline(api_key)
             if chain:
                 st.session_state.rag_chain  = chain
                 st.session_state.db_ready   = True
