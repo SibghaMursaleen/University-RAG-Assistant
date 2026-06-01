@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Sidebar Logo & Theme Switcher ────────────────────────────────────────────
+# ── Sidebar Logo ─────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-logo">
@@ -25,77 +25,39 @@ with st.sidebar:
         <div class="logo-sub">AI-Powered Course Guide</div>
     </div>
     """, unsafe_allow_html=True)
-    theme_mode = st.radio(
-        "🎨 App Theme", ["Light Mode", "Dark Mode"],
-        index=0, horizontal=True
-    )
-    st.markdown('<hr class="divider"/>', unsafe_allow_html=True)
 
-# ── Theme Configuration & CSS Injection ──────────────────────────────────────
-if theme_mode == "Light Mode":
-    css_vars = """
-    :root {
-        --bg-app: #f8fafc !important;
-        --text-color: #0f172a !important;
-        --sidebar-bg: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
-        --sidebar-border: rgba(99, 102, 241, 0.12) !important;
-        --sidebar-title: #4f46e5 !important;
-        --card-bg: rgba(255, 255, 255, 0.85) !important;
-        --card-border: rgba(99, 102, 241, 0.12) !important;
-        --ai-bubble-bg: #ffffff !important;
-        --ai-bubble-border: rgba(99, 102, 241, 0.12) !important;
-        --ai-bubble-text: #1e293b !important;
-        --ai-bubble-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-        --source-chip-bg: rgba(99, 102, 241, 0.06) !important;
-        --source-chip-border: rgba(99, 102, 241, 0.18) !important;
-        --source-chip-text: #4f46e5 !important;
-        --input-bg: #ffffff !important;
-        --input-border: rgba(99, 102, 241, 0.2) !important;
-        --input-text: #0f172a !important;
-        --input-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-        --divider-color: rgba(99, 102, 241, 0.12) !important;
-        --hero-title-gradient: linear-gradient(135deg, #4f46e5 20%, #7c3aed 80%) !important;
-        --hero-subtitle: #475569 !important;
-        --empty-state-title: #334155 !important;
-        --empty-state-subtitle: #64748b !important;
-        --info-box-bg: rgba(99, 102, 241, 0.05) !important;
-        --info-box-border: rgba(99, 102, 241, 0.12) !important;
-        --info-box-text: #475569 !important;
-        --secondary-text: #64748b !important;
-    }
-    """
-else:
-    css_vars = """
-    :root {
-        --bg-app: #0d0f1a !important;
-        --text-color: #e2e8f0 !important;
-        --sidebar-bg: linear-gradient(180deg, #111827 0%, #0d1117 100%) !important;
-        --sidebar-border: rgba(99, 102, 241, 0.18) !important;
-        --sidebar-title: #818cf8 !important;
-        --card-bg: rgba(17, 24, 39, 0.85) !important;
-        --card-border: rgba(99, 102, 241, 0.2) !important;
-        --ai-bubble-bg: rgba(17, 24, 39, 0.85) !important;
-        --ai-bubble-border: rgba(99, 102, 241, 0.2) !important;
-        --ai-bubble-text: #e2e8f0 !important;
-        --ai-bubble-shadow: 0 4px 24px rgba(0, 0, 0, 0.35) !important;
-        --source-chip-bg: rgba(99, 102, 241, 0.1) !important;
-        --source-chip-border: rgba(99, 102, 241, 0.25) !important;
-        --source-chip-text: #a5b4fc !important;
-        --input-bg: rgba(17, 24, 39, 0.85) !important;
-        --input-border: rgba(99, 102, 241, 0.3) !important;
-        --input-text: #e2e8f0 !important;
-        --input-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-        --divider-color: rgba(99, 102, 241, 0.12) !important;
-        --hero-title-gradient: linear-gradient(135deg, #818cf8 20%, #c084fc 80%) !important;
-        --hero-subtitle: #64748b !important;
-        --empty-state-title: #4b5563 !important;
-        --empty-state-subtitle: #6b7280 !important;
-        --info-box-bg: rgba(99, 102, 241, 0.08) !important;
-        --info-box-border: rgba(99, 102, 241, 0.2) !important;
-        --info-box-text: #94a3b8 !important;
-        --secondary-text: #64748b !important;
-    }
-    """
+# ── Theme Configuration & CSS Injection (Premium Dark Glassmorphism) ─────────
+css_vars = """
+:root {
+    --bg-app: #0d0f1a !important;
+    --text-color: #e2e8f0 !important;
+    --sidebar-bg: linear-gradient(180deg, #111827 0%, #0d1117 100%) !important;
+    --sidebar-border: rgba(99, 102, 241, 0.18) !important;
+    --sidebar-title: #818cf8 !important;
+    --card-bg: rgba(17, 24, 39, 0.85) !important;
+    --card-border: rgba(99, 102, 241, 0.2) !important;
+    --ai-bubble-bg: rgba(17, 24, 39, 0.85) !important;
+    --ai-bubble-border: rgba(99, 102, 241, 0.2) !important;
+    --ai-bubble-text: #e2e8f0 !important;
+    --ai-bubble-shadow: 0 4px 24px rgba(0, 0, 0, 0.35) !important;
+    --source-chip-bg: rgba(99, 102, 241, 0.1) !important;
+    --source-chip-border: rgba(99, 102, 241, 0.25) !important;
+    --source-chip-text: #a5b4fc !important;
+    --input-bg: rgba(17, 24, 39, 0.85) !important;
+    --input-border: rgba(99, 102, 241, 0.3) !important;
+    --input-text: #e2e8f0 !important;
+    --input-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    --divider-color: rgba(99, 102, 241, 0.12) !important;
+    --hero-title-gradient: linear-gradient(135deg, #818cf8 20%, #c084fc 80%) !important;
+    --hero-subtitle: #64748b !important;
+    --empty-state-title: #4b5563 !important;
+    --empty-state-subtitle: #6b7280 !important;
+    --info-box-bg: rgba(99, 102, 241, 0.08) !important;
+    --info-box-border: rgba(99, 102, 241, 0.2) !important;
+    --info-box-text: #94a3b8 !important;
+    --secondary-text: #64748b !important;
+}
+"""
 
 # Injected CSS stylesheet using variables
 st.markdown(f"""
