@@ -16,6 +16,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── Lazy imports of our pipeline modules ─────────────────────────────────────
+from src.document_loader import load_pdf
+from src.text_splitter import split_documents
+from src.embeddings import get_embedding_model
+from src.vector_store import create_vector_store, load_vector_store
+from src.retriever import get_retriever
+from src.rag_chain import get_gemini_llm, create_rag_chain
+
 # ── Sidebar Logo ─────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
