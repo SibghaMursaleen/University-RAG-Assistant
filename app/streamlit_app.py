@@ -185,22 +185,58 @@ html, body, .stApp {
 
 /* ── Chat input bar ── */
 .stChatInput {
-    border-top: 1px solid rgba(99,102,241,0.15) !important;
+    border-top: 1px solid rgba(99,102,241,0.12) !important;
     padding-top: 0.8rem !important;
     background: transparent !important;
 }
-[data-testid="stChatInput"] textarea {
-    background: rgba(17,24,39,0.9) !important;
-    border: 1.5px solid rgba(99,102,241,0.3) !important;
+
+/* Make Streamlit's outer container transparent so we can style the input box */
+[data-testid="stChatInput"] {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* Style the actual input box container (wraps textarea and button) */
+[data-testid="stChatInput"] > div {
+    background: rgba(17, 24, 39, 0.85) !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
     border-radius: 14px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+/* Add custom focus effect to the container when the user clicks inside */
+[data-testid="stChatInput"] > div:focus-within {
+    border-color: rgba(99, 102, 241, 0.7) !important;
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Make the internal textarea transparent and borderless */
+[data-testid="stChatInput"] textarea {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.92rem !important;
-    transition: border-color 0.2s !important;
+    font-size: 0.95rem !important;
 }
-[data-testid="stChatInput"] textarea:focus {
-    border-color: rgba(99,102,241,0.65) !important;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+
+/* Style the send button inside to match our theme */
+[data-testid="stChatInput"] button {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: white !important;
+    transition: transform 0.1s ease, opacity 0.2s ease !important;
+}
+
+[data-testid="stChatInput"] button:hover {
+    opacity: 0.9 !important;
+    transform: scale(1.05) !important;
+}
+
+[data-testid="stChatInput"] button:active {
+    transform: scale(0.95) !important;
 }
 
 /* ── Hero title section ── */
