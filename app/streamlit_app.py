@@ -37,33 +37,33 @@ with st.sidebar:
 # ── Theme Configuration & CSS Injection (Premium Dark Glassmorphism) ─────────
 css_vars = """
 :root {
-    --bg-app: #0d0f1a !important;
-    --text-color: #e2e8f0 !important;
-    --sidebar-bg: linear-gradient(180deg, #111827 0%, #0d1117 100%) !important;
-    --sidebar-border: rgba(99, 102, 241, 0.18) !important;
-    --sidebar-title: #818cf8 !important;
-    --card-bg: rgba(17, 24, 39, 0.85) !important;
-    --card-border: rgba(99, 102, 241, 0.2) !important;
-    --ai-bubble-bg: rgba(17, 24, 39, 0.85) !important;
-    --ai-bubble-border: rgba(99, 102, 241, 0.2) !important;
-    --ai-bubble-text: #e2e8f0 !important;
-    --ai-bubble-shadow: 0 4px 24px rgba(0, 0, 0, 0.35) !important;
-    --source-chip-bg: rgba(99, 102, 241, 0.1) !important;
-    --source-chip-border: rgba(99, 102, 241, 0.25) !important;
-    --source-chip-text: #a5b4fc !important;
-    --input-bg: rgba(17, 24, 39, 0.85) !important;
-    --input-border: rgba(99, 102, 241, 0.3) !important;
-    --input-text: #e2e8f0 !important;
-    --input-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-    --divider-color: rgba(99, 102, 241, 0.12) !important;
-    --hero-title-gradient: linear-gradient(135deg, #818cf8 20%, #c084fc 80%) !important;
-    --hero-subtitle: #64748b !important;
-    --empty-state-title: #4b5563 !important;
-    --empty-state-subtitle: #6b7280 !important;
-    --info-box-bg: rgba(99, 102, 241, 0.08) !important;
-    --info-box-border: rgba(99, 102, 241, 0.2) !important;
-    --info-box-text: #94a3b8 !important;
-    --secondary-text: #64748b !important;
+    --bg-app: #0d0f1a;
+    --text-color: #e2e8f0;
+    --sidebar-bg: linear-gradient(180deg, #111827 0%, #0d1117 100%);
+    --sidebar-border: rgba(99, 102, 241, 0.18);
+    --sidebar-title: #818cf8;
+    --card-bg: rgba(17, 24, 39, 0.85);
+    --card-border: rgba(99, 102, 241, 0.2);
+    --ai-bubble-bg: rgba(17, 24, 39, 0.85);
+    --ai-bubble-border: rgba(99, 102, 241, 0.2);
+    --ai-bubble-text: #e2e8f0;
+    --ai-bubble-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    --source-chip-bg: rgba(99, 102, 241, 0.1);
+    --source-chip-border: rgba(99, 102, 241, 0.25);
+    --source-chip-text: #a5b4fc;
+    --input-bg: rgba(17, 24, 39, 0.85);
+    --input-border: rgba(99, 102, 241, 0.3);
+    --input-text: #e2e8f0;
+    --input-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --divider-color: rgba(99, 102, 241, 0.12);
+    --hero-title-gradient: linear-gradient(135deg, #818cf8 20%, #c084fc 80%);
+    --hero-subtitle: #64748b;
+    --empty-state-title: #4b5563;
+    --empty-state-subtitle: #6b7280;
+    --info-box-bg: rgba(99, 102, 241, 0.08);
+    --info-box-border: rgba(99, 102, 241, 0.2);
+    --info-box-text: #94a3b8;
+    --secondary-text: #64748b;
 }
 """
 
@@ -397,10 +397,11 @@ html, body, .stApp {{
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE  ── initialize on first load
 # ─────────────────────────────────────────────────────────────────────────────
-if "messages"    not in st.session_state: st.session_state.messages    = []
-if "rag_chain"   not in st.session_state: st.session_state.rag_chain   = None
-if "db_ready"    not in st.session_state: st.session_state.db_ready    = False
-if "api_key_ok"  not in st.session_state: st.session_state.api_key_ok  = False
+if "messages"       not in st.session_state: st.session_state.messages       = []
+if "rag_chain"      not in st.session_state: st.session_state.rag_chain      = None
+if "db_ready"       not in st.session_state: st.session_state.db_ready       = False
+if "api_key_ok"     not in st.session_state: st.session_state.api_key_ok     = False
+if "confirm_clear"  not in st.session_state: st.session_state.confirm_clear  = False
 
 DB_PATH  = r"u:\Projects\University-RAG-Assistant\vector_db\faiss_index"
 PDF_DIR  = r"u:\Projects\University-RAG-Assistant\data\pdfs"
@@ -529,8 +530,8 @@ with st.sidebar:
             if chain:
                 st.session_state.rag_chain  = chain
                 st.session_state.db_ready   = True
-        except Exception:
-            pass
+        except Exception as e:
+            st.sidebar.error(f"Failed to auto-load RAG chain: {e}")
 
     st.markdown('<hr class="divider"/>', unsafe_allow_html=True)
 
@@ -538,6 +539,63 @@ with st.sidebar:
     if st.button("🗑️ Clear Conversation"):
         st.session_state.messages = []
         st.rerun()
+
+    st.markdown('<hr class="divider"/>', unsafe_allow_html=True)
+
+    # ── Clear Knowledge Base ──────────────────────────────────────────────────
+    st.markdown("#### 🧹 Manage Documents")
+
+    # Show which PDFs are currently indexed
+    pdf_files = []
+    if os.path.exists(PDF_DIR):
+        pdf_files = [f for f in os.listdir(PDF_DIR) if f.lower().endswith(".pdf")]
+
+    if pdf_files:
+        st.markdown(
+            f'<div class="info-box">📄 <b>{len(pdf_files)}</b> document(s) currently indexed:</div>',
+            unsafe_allow_html=True
+        )
+        for pdf in pdf_files:
+            st.markdown(
+                f'<div style="font-size:0.78rem; color:#a5b4fc; padding:0.15rem 0.5rem;">📎 {pdf}</div>',
+                unsafe_allow_html=True
+            )
+    else:
+        st.markdown(
+            '<div class="info-box">No documents in the knowledge base.</div>',
+            unsafe_allow_html=True
+        )
+
+    if not st.session_state.confirm_clear:
+        if st.button("🗑️ Clear Knowledge Base", disabled=not pdf_files and not check_db_exists()):
+            st.session_state.confirm_clear = True
+            st.rerun()
+    else:
+        st.warning("⚠️ This will delete **all** indexed PDFs and the FAISS index. Are you sure?")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✅ Yes, Delete", type="primary"):
+                # Delete all PDFs
+                if os.path.exists(PDF_DIR):
+                    for f in os.listdir(PDF_DIR):
+                        if f.lower().endswith(".pdf"):
+                            os.remove(os.path.join(PDF_DIR, f))
+                # Delete FAISS index files
+                for fname in ["index.faiss", "index.pkl"]:
+                    fpath = os.path.join(DB_PATH, fname)
+                    if os.path.exists(fpath):
+                        os.remove(fpath)
+                # Reset state
+                st.session_state.rag_chain     = None
+                st.session_state.db_ready      = False
+                st.session_state.messages      = []
+                st.session_state.confirm_clear = False
+                st.success("✅ Knowledge base cleared!")
+                st.rerun()
+        with col2:
+            if st.button("❌ Cancel"):
+                st.session_state.confirm_clear = False
+                st.rerun()
 
     st.markdown("""
     <div style="text-align:center; font-size:0.72rem; color:#374151; padding-top:1rem;">

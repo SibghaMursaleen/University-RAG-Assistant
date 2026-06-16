@@ -1,155 +1,184 @@
-# 🎓 University RAG Assistant
+<h1 align="center">🎓 University RAG Assistant</h1>
 
-An **AI-powered Retrieval-Augmented Generation (RAG)** assistant that lets students ask natural language questions about their course syllabi, lecture notes, and assignments — and receive precise, grounded answers with page-level citations.
+<p align="center">
+  An AI-powered academic assistant that answers student questions using your own course documents.<br/>
+  Upload any syllabus or lecture PDF and get precise, source-cited answers — no hallucinations.
+</p>
 
-Built as a **portfolio-quality AI project** demonstrating end-to-end LLM engineering: from raw PDF parsing to semantic vector search to a polished production UI.
-
----
-
-## ✨ Features
-
-- 📄 **Multi-PDF Ingestion**: Upload any course PDF (syllabus, lecture slides, notes) via the web UI
-- 🧠 **Semantic Search with FAISS**: Fast, local vector similarity search using Gemini embeddings
-- 🤖 **Gemini-Powered Answers**: Grounded, citation-backed answers using `gemini-2.5-flash`
-- 📌 **Source Citations**: Every answer shows the exact PDF filename and page number used
-- 🛡️ **Hallucination Guard**: The assistant politely refuses to answer out-of-scope questions
-- 💬 **Persistent Chat History**: Full session-level conversation memory in the UI
-- 🎨 **Premium Dark UI**: Glassmorphism design with animated chat bubbles and typing indicators
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Streamlit-1.58-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/LangChain-1.3-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white"/>
+  <img src="https://img.shields.io/badge/FAISS-Vector_DB-00599C?style=for-the-badge&logo=meta&logoColor=white"/>
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge"/>
+</p>
 
 ---
 
-## 🏗️ Architecture
+## 📌 Overview
 
-```
-PDF Documents
-      ↓
- PyPDF Loader  (src/document_loader.py)
-      ↓
-Text Splitter  (src/text_splitter.py)   ← RecursiveCharacterTextSplitter, chunk=500, overlap=100
-      ↓
-Gemini Embeddings  (src/embeddings.py)  ← models/gemini-embedding-001 → 768-dim vectors
-      ↓
-   FAISS Index  (src/vector_store.py)   ← Saved locally in vector_db/
-      ↓
-──────────────────────────────────
-      ↓
- User Question → Embed → MMR Search  (src/retriever.py)   k=3 diverse chunks
-      ↓
-Prompt Assembly + Gemini LLM  (src/rag_chain.py)
-      ↓
-   Final Answer + Source Citations
-      ↓
- Streamlit Web UI  (app/streamlit_app.py)
-```
+**University RAG Assistant** is a **Retrieval-Augmented Generation (RAG)** pipeline built for students and educators. It lets you upload course PDFs — syllabi, lecture notes, assignment briefs — and then ask natural language questions about them. The assistant retrieves the most relevant document chunks using **FAISS semantic search**, injects them into a strict prompt, and uses **Gemini 2.5 Flash** to generate grounded, accurate answers with full source citations.
+
+> **Key:** The system never fabricates information. If the answer isn't in your documents, it says so honestly.
 
 ---
 
-## 🗂️ Project Structure
+## ⚙️ How It Works
+
+| Step | Stage | Description |
+|------|-------|-------------|
+| 1 | **Document Loading** | PDFs are parsed page-by-page using `PyPDFLoader`, preserving metadata (source file, page number) |
+| 2 | **Text Splitting** | Pages are chunked into 500-token segments with 100-token overlap using `RecursiveCharacterTextSplitter` |
+| 3 | **Embedding** | Each chunk is embedded into a 768-dimensional vector using Google's `gemini-embedding-001` model |
+| 4 | **Indexing** | Vectors are stored in a local **FAISS** index with batched API calls to respect free-tier rate limits |
+| 5 | **Retrieval** | At query time, **MMR (Maximal Marginal Relevance)** retrieves the top-3 diverse, relevant chunks |
+| 6 | **Generation** | A strict system prompt + retrieved context is sent to **Gemini 2.5 Flash** (temp=0.2) for grounded answers |
+| 7 | **Citation** | The UI displays the exact source file and page number for every answer |
+
+---
+
+## 📁 Project Structure
 
 ```
-university-rag-assistant/
+University-RAG-Assistant/
+│
 ├── app/
-│   └── streamlit_app.py        # Premium Streamlit chat UI
-├── data/
-│   └── pdfs/                   # Place your PDF documents here
+│   └── streamlit_app.py     # Full Streamlit UI (dark glassmorphism theme)
+│
 ├── src/
-│   ├── document_loader.py      # PDF parsing with metadata
-│   ├── text_splitter.py        # Recursive chunking with overlap
-│   ├── embeddings.py           # Gemini embedding client
-│   ├── vector_store.py         # FAISS index creation & persistence
-│   ├── retriever.py            # MMR similarity search
-│   └── rag_chain.py            # LangChain retrieval chain + LLM
-├── vector_db/                  # Auto-generated FAISS index files
-├── .env                        # Your API key (never commit this!)
-├── .env.template               # Template for new contributors
-├── .gitignore
-├── requirements.txt
-├── main.py                     # CLI interactive session
-└── README.md
+│   ├── document_loader.py   # PDF parsing with PyPDFLoader
+│   ├── text_splitter.py     # Recursive chunking with overlap
+│   ├── embeddings.py        # Google Gemini embedding model wrapper
+│   ├── vector_store.py      # Batched FAISS index creation & loading
+│   ├── retriever.py         # MMR retriever configuration
+│   └── rag_chain.py         # LangChain retrieval chain assembly
+│
+├── data/
+│   └── pdfs/                # Place your course PDFs here (gitignored)
+│
+├── vector_db/
+│   └── faiss_index/         # Auto-generated FAISS index (gitignored)
+│
+├── main.py                  # CLI interactive session entry point
+├── requirements.txt         # Python dependencies
+├── .env.template            # API key configuration template
+└── .gitignore
 ```
+
+> **Note:** `data/pdfs/` and `vector_db/` are excluded from Git. The FAISS index is regenerated automatically when you upload PDFs and click **Build Knowledge Base**.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
-### 1. Clone & Setup
+### Prerequisites
+
+- Python 3.10 or higher
+- A Google Gemini API key — get one free at [aistudio.google.com](https://aistudio.google.com/)
+
+### Step 1 — Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd university-rag-assistant
+git clone https://github.com/SibghaMursaleen/University-RAG-Assistant.git
+cd University-RAG-Assistant
+```
 
-# Create virtual environment
+### Step 2 — Create a Virtual Environment
+
+```bash
 python -m venv .venv
-.\.venv\Scripts\activate      # Windows
-# source .venv/bin/activate   # macOS/Linux
 
-# Install dependencies
+# Windows
+.venv\Scripts\activate
+
+# macOS / Linux
+source .venv/bin/activate
+```
+
+### Step 3 — Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure API Key
+### Step 4 — Configure Your API Key
 
 ```bash
-# Copy the template and add your key
-copy .env.template .env
+# Copy the template
+cp .env.template .env
 ```
 
-Edit `.env`:
+Open `.env` and replace the placeholder with your actual key:
+
 ```env
-GOOGLE_API_KEY=AIzaSy...your_key_here
+GOOGLE_API_KEY=your_actual_gemini_api_key_here
 ```
 
-Get a free API key at 👉 https://aistudio.google.com/
-
-### 3. Launch the Web App
+### Step 5 — Run the App
 
 ```bash
-.\.venv\Scripts\streamlit run app\streamlit_app.py
+streamlit run app/streamlit_app.py
 ```
 
-Open your browser at **http://localhost:8501**
+Then open **http://localhost:8501** in your browser.
 
-### 4. Add Your Documents
-
-1. Click **Upload Course Documents** in the sidebar
-2. Drop your syllabus or lecture PDFs
-3. Click **⚡ Build Knowledge Base**
-4. Start chatting!
-
-### 5. (Optional) CLI Mode
-
-```bash
-.\.venv\Scripts\python main.py
-```
+| Action | How |
+|--------|-----|
+| Upload PDFs | Use the sidebar file uploader |
+| Build index | Click **⚡ Build Knowledge Base** |
+| Ask questions | Type in the chat input at the bottom |
+| Clear documents | Click **🗑️ Clear Knowledge Base** in the sidebar |
 
 ---
 
-## 📦 Tech Stack
+## 🎨 Configuration
 
-| Layer | Technology |
-|---|---|
-| Language | Python 3.11+ |
-| LLM Framework | LangChain / LangChain Classic |
-| Generator | Google Gemini 2.5 Flash |
-| Embeddings | Gemini Embedding 001 (768-dim) |
-| Vector DB | FAISS (local, CPU) |
-| PDF Parsing | PyPDF + PyMuPDF |
-| Web UI | Streamlit |
-| Config | python-dotenv |
+| Option | Default | Description |
+|--------|---------|-------------|
+| `chunk_size` | `500` | Token size of each document chunk |
+| `chunk_overlap` | `100` | Overlap between consecutive chunks |
+| `retriever k` | `3` | Number of chunks retrieved per query |
+| `search_type` | `mmr` | MMR for diverse retrieval (vs. similarity) |
+| `temperature` | `0.2` | Low temp for factual, deterministic answers |
+| `model` | `gemini-2.5-flash` | Gemini model used for generation |
+| `embedding_model` | `gemini-embedding-001` | Model used for chunk + query embedding |
 
 ---
 
-## 🧠 What You Learn Building This
+## 🛠️ Tech Stack
 
-- How **embeddings** convert text to 768-dimensional geometric vectors
-- How **FAISS** indexes vectors for sub-millisecond similarity search
-- How **RAG** retrieves relevant context before generating answers
-- How **LangChain** chains retrieval → prompt → LLM in a clean pipeline
-- How to prevent **hallucinations** with strict system prompts
-- How to build **production-quality AI UIs** with Streamlit
+| Technology | Role |
+|------------|------|
+| **Python 3.10+** | Core language |
+| **Streamlit 1.58** | Interactive web UI with dark glassmorphism theme |
+| **LangChain** | RAG pipeline orchestration (retrieval chain, prompt templating) |
+| **FAISS (CPU)** | High-performance local vector similarity search |
+| **Google Gemini 2.5 Flash** | LLM for answer generation |
+| **Google Gemini Embedding-001** | Text embedding into 768-dim vectors |
+| **PyPDF / PyMuPDF** | PDF parsing and page extraction |
+| **python-dotenv** | Secure environment variable management |
+
+---
+
+## ⚠️ Tips & Best Practices
+
+- **PDF quality matters** — Scanned image PDFs won't parse well. Use text-based PDFs for best results.
+- **Chunk your uploads** — The free Gemini embedding tier allows 100 requests/minute. The app automatically batches and rate-limits.
+- **Keep temperature low** — The default `0.2` is ideal for factual RAG. Increasing it may cause the model to drift from your documents.
+- **FAISS index is reusable** — Once built, the index is saved locally. You won't need to re-embed on every run.
+- **Never commit your `.env`** — Your `GOOGLE_API_KEY` is in `.gitignore`. Keep it that way.
 
 ---
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+This project is released under the [MIT License](LICENSE) — free to use, modify, and distribute.
+
+---
+
+<p align="center">
+  Built with 🦜 LangChain &nbsp;·&nbsp; 🔍 FAISS &nbsp;·&nbsp; ✨ Gemini &nbsp;·&nbsp; 🎈 Streamlit
+  <br/>
+  <sub>Made by <a href="https://github.com/SibghaMursaleen">Sibgha Mursaleen</a></sub>
+</p>
